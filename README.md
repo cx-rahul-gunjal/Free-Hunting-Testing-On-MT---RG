@@ -1,154 +1,165 @@
-# NodeGoat
+# WebGoat: A deliberately insecure Web Application
 
-Being lightweight, fast, and scalable, Node.js is becoming a widely adopted platform for developing web applications. This project provides an environment to learn how OWASP Top 10 security risks apply to web applications developed using Node.js and how to effectively address them.
+[![Build](https://github.com/WebGoat/WebGoat/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/WebGoat/WebGoat/actions/workflows/build.yml)
+[![java-jdk](https://img.shields.io/badge/java%20jdk-25-green.svg)](https://jdk.java.net/)
+[![OWASP Labs](https://img.shields.io/badge/OWASP-Lab%20project-f7b73c.svg)](https://owasp.org/projects/)
+[![GitHub release](https://img.shields.io/github/release/WebGoat/WebGoat.svg)](https://github.com/WebGoat/WebGoat/releases/latest)
+[![Gitter](https://badges.gitter.im/OWASPWebGoat/community.svg)](https://gitter.im/OWASPWebGoat/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Discussions](https://img.shields.io/github/discussions/WebGoat/WebGoat)](https://github.com/WebGoat/WebGoat/discussions)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
-## Getting Started
-OWASP Top 10 for Node.js web applications:
+# Introduction
 
-### Know it!
-[Tutorial Guide](http://nodegoat.herokuapp.com/tutorial) explaining how each of the OWASP Top 10 vulnerabilities can manifest in Node.js web apps and how to prevent it.
+WebGoat is a deliberately insecure web application maintained by [OWASP](http://www.owasp.org/) designed to teach web
+application security lessons.
 
-### Do it!
-[A Vulnerable Node.js App for Ninjas](http://nodegoat.herokuapp.com/) to exploit, toast, and fix. You may like to [set up your own copy](#how-to-set-up-your-copy-of-nodegoat) of the app to fix and test vulnerabilities. Hint: Look for comments in the source code.
-##### Default user accounts
-The database comes pre-populated with these user accounts created as part of the seed data -
-* Admin Account - u:admin p:Admin_123
-* User Accounts (u:user1 p:User1_123), (u:user2 p:User2_123)
-* New users can also be added using the sign-up page.
+This program is a demonstration of common server-side application flaws. The
+exercises are intended to be used by people to learn about application security and
+penetration testing techniques.
 
-## How to Set Up Your Copy of NodeGoat
+**WARNING 1:** *While running this program your machine will be extremely
+vulnerable to attack. You should disconnect from the Internet while using
+this program.*  WebGoat's default configuration binds to localhost to minimize
+the exposure.
 
-### OPTION 1 - Run NodeGoat on your machine
+**WARNING 2:** *This program is for educational purposes only. If you attempt
+these techniques without authorization, you are very likely to get caught. If
+you are caught engaging in unauthorized hacking, most companies will fire you.
+Claiming that you were doing security research will not work as that is the
+first thing that all hackers claim.*
 
-1) Install [Node.js](http://nodejs.org/) - NodeGoat requires Node v8 or above
+![WebGoat](docs/images/webgoat.png)
 
-2) Clone the github repository:
-   ```
-   git clone https://github.com/OWASP/NodeGoat.git
-   ```
+# Installation instructions:
 
-3) Go to the directory:
-   ```
-   cd NodeGoat
-   ```
+For more details check [the Contribution guide](/CONTRIBUTING.md)
 
-4) Install node packages:
-   ```
-   npm install
-   ```
+## 1. Run using Docker
 
-5) Set up MongoDB. You can either install MongoDB locally or create a remote instance:
+Already have a browser and ZAP and/or Burp installed on your machine in this case you can run the WebGoat image directly using Docker.
 
-   * Using local MongoDB:
-     1) Install [MongoDB Community Server](https://docs.mongodb.com/manual/administration/install-community/)
-     2) Start [mongod](http://docs.mongodb.org/manual/reference/program/mongod/#bin.mongod)
+Every release is also published on [DockerHub](https://hub.docker.com/r/webgoat/webgoat).
 
-   * Using remote MongoDB instance:
-     1) [Deploy a MongoDB Atlas free tier cluster](https://docs.atlas.mongodb.com/tutorial/deploy-free-tier-cluster/) (M0 Sandbox)
-     2) [Enable network access](https://docs.atlas.mongodb.com/security/add-ip-address-to-list/) to the cluster from your current IP address
-     3) [Add a database user](https://docs.atlas.mongodb.com/tutorial/create-mongodb-user-for-cluster/) to the cluster
-     4) Set the `MONGODB_URI` environment variable to the connection string of your cluster, which can be viewed in the cluster's
-        [connect dialog](https://docs.atlas.mongodb.com/tutorial/connect-to-your-cluster/#connect-to-your-atlas-cluster). Select "Connect your application",
-        set the driver to "Node.js" and the version to "2.2.12 or later". This will give a connection string in the form:
-        ```
-        mongodb://<username>:<password>@<cluster>/<dbname>?ssl=true&replicaSet=<rsname>&authSource=admin&retryWrites=true&w=majority
-        ```
-        The `<username>` and `<password>` fields need filling in with the details of the database user added earlier. The `<dbname>` field sets the name of the
-        database nodegoat will use in the cluster (eg "nodegoat"). The other fields will already be filled in with the correct details for your cluster.
+```shell
+docker run -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 webgoat/webgoat
+```
 
-6) Populate MongoDB with the seed data required for the app:
-   ```
-   npm run db:seed
-   ```
-   By default this will use the "development" configuration, but the desired config can be passed as an argument if required.
+For some lessons you need the container run in the same timezone. For this you can set the TZ environment variable.
+E.g.
 
-7) Start the server. You can run the server using node or nodemon:
-   * Start the server with node. This starts the NodeGoat application at [http://localhost:4000/](http://localhost:4000/):
-     ```
-     npm start
-     ```
-   * Start the server with nodemon, which will automatically restart the application when you make any changes. This starts the NodeGoat application at [http://localhost:5000/](http://localhost:5000/):
-     ```
-     npm run dev
-     ```
+```shell
+docker run -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e TZ=America/Boise webgoat/webgoat
+```
 
-#### Customizing the Default Application Configuration
-By default the application will be hosted on port 4000 and will connect to a MongoDB instance at localhost:27017. To change this set the environment variables `PORT` and `MONGODB_URI`.
+If you want to use OWASP ZAP or another proxy, you can no longer use 127.0.0.1 or localhost. but
+you can use custom host entries. For example:
 
-Other settings can be changed by updating the [config file](https://github.com/OWASP/NodeGoat/blob/master/config/env/all.js).
+```shell
+127.0.0.1 www.webgoat.local www.webwolf.local
+```
 
+Then you can run the container with:
 
-### OPTION 2 - Run NodeGoat on Docker
+```shell
+docker run -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e WEBGOAT_HOST=www.webgoat.local -e WEBWOLF_HOST=www.webwolf.local -e TZ=America/Boise webgoat/webgoat
+```
 
-The repo includes the Dockerfile and docker-compose.yml necessary to set up the app and db instance, then connect them together.
+Then visit http://www.webgoat.local:8080/WebGoat/ and http://www.webwolf.local:9090/WebWolf/
 
-1) Install [docker](https://docs.docker.com/installation/) and [docker compose](https://docs.docker.com/compose/install/) 
+## 2. Run using Docker with complete Linux Desktop
 
-2) Clone the github repository:
-   ```
-   git clone https://github.com/OWASP/NodeGoat.git
-   ```
+Instead of installing tools locally we have a complete Docker image based on running a desktop in your browser. This way you only have to run a Docker image which will give you the best user experience.
 
-3) Go to the directory:
-   ```
-   cd NodeGoat
-   ```
+```shell
+docker run -p 127.0.0.1:3000:3000 webgoat/webgoat-desktop
+```
 
-4) Build the images:
-   ```
-   docker-compose build
-   ```
+## 3. Standalone
 
-5) Run the app, this starts the NodeGoat application at http://localhost:4000/:
-   ```
-   docker-compose up
-   ```
+Download the latest WebGoat release from [https://github.com/WebGoat/WebGoat/releases](https://github.com/WebGoat/WebGoat/releases)
 
+```shell
+export TZ=Europe/Amsterdam # or your timezone
+java -Dfile.encoding=UTF-8 -jar webgoat-2023.8.jar
+```
 
-### OPTION 3 - Deploy to Heroku
+Click the link in the log to start WebGoat.
 
-This option uses a free ($0/month) Heroku node server.
+### 3.1 Running on a different port
 
-Though not essential, it is recommended that you fork this repository and deploy the forked repo.
-This will allow you to fix vulnerabilities in your own forked version, then deploy and test it on Heroku.
+If for some reason you want to run WebGoat on a different port, you can do so by adding the following parameter:
 
-1) Set up a publicly accessible MongoDB instance:
-   1) [Deploy a MongoDB Atlas free tier cluster](https://docs.atlas.mongodb.com/tutorial/deploy-free-tier-cluster/) (M0 Sandbox)
-   2) [Enable network access](https://docs.atlas.mongodb.com/security/ip-access-list/#add-ip-access-list-entries) to the cluster from anywhere (CIDR range 0.0.0.0/0)
-   3) [Add a database user](https://docs.atlas.mongodb.com/tutorial/create-mongodb-user-for-cluster/) to the cluster
+```shell
+java -jar webgoat-2023.8.jar --webgoat.port=8001 --webwolf.port=8002
+```
 
-2) Deploy NodeGoat to Heroku by clicking the button below:
+For a full overview of all the parameters you can use, please check the [WebGoat properties file](webgoat-container/src/main/resources/application-{webgoat, webwolf}.properties).
 
-   [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+## 4. Run from the sources
 
-   In the Create New App dialog, set the `MONGODB_URI` config var to the connection string of your MongoDB Atlas cluster.
-   This can be viewed in the cluster's [connect dialog](https://docs.atlas.mongodb.com/tutorial/connect-to-your-cluster/#connect-to-your-atlas-cluster).
-   Select "Connect your application", set the driver to "Node.js" and the version to "2.2.12 or later".
-   This will give a connection string in the form:
-   ```
-   mongodb://<username>:<password>@<cluster>/<dbname>?ssl=true&replicaSet=<rsname>&authSource=admin&retryWrites=true&w=majority
-   ```
-   The `<username>` and `<password>` fields need filling in with the details of the database user added earlier. The `<dbname>` field sets the name of the
-   database nodegoat will use in the cluster (eg "nodegoat"). The other fields will already be filled in with the correct details for your cluster.
+### Prerequisites:
 
+* Java 25
+* Your favorite IDE
+* Git, or Git support in your IDE
 
-## Report bugs, Feedback, Comments
-*  Open a new [issue](https://github.com/OWASP/NodeGoat/issues) or contact team by joining chat at [Slack](https://owasp.slack.com/messages/project-nodegoat/) or [![Join the chat at https://gitter.im/OWASP/NodeGoat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OWASP/NodeGoat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Open a command shell/window:
 
+```Shell
+git clone git@github.com:WebGoat/WebGoat.git
+```
 
-## Contributing
+Now let's start by compiling the project.
 
-Please Follow [the contributing guide](CONTRIBUTING.md)
+```Shell
+cd WebGoat
+git checkout <<branch_name>>
+# On Linux/Mac:
+./mvnw clean install
 
-## Code Of Conduct (CoC)
+# On Windows:
+./mvnw.cmd clean install
 
-This project is bound by a [Code of Conduct](CODE_OF_CONDUCT.md).
+# Using docker or podman, you can than build the container locally
+docker build -f Dockerfile . -t webgoat/webgoat
+```
 
-## Contributors
-Here are the amazing [contributors](https://github.com/OWASP/NodeGoat/graphs/contributors) to the NodeGoat project.
+Now we are ready to run the project. WebGoat is using Spring Boot.
 
-## Supports
-- Thanks to JetBrains for providing licenses to fantastic [WebStorm IDE](https://www.jetbrains.com/webstorm/) to build this project.
+```Shell
+# On Linux/Mac:
+./mvnw spring-boot:run
+# On Windows:
+./mvnw.cmd spring-boot:run
 
-## License
-Code licensed under the [Apache License v2.0.](http://www.apache.org/licenses/LICENSE-2.0)
+```
+
+... you should be running WebGoat on http://localhost:8080/WebGoat momentarily.
+
+Note: The above link will redirect you to login page if you are not logged in. LogIn/Create account to proceed.
+
+To change the IP address add the following variable to the `WebGoat/webgoat-container/src/main/resources/application.properties` file:
+
+```
+server.address=x.x.x.x
+```
+
+## 4. Run with custom menu
+
+For specialist only. There is a way to set up WebGoat with a personalized menu. You can leave out some menu categories or individual lessons by setting certain environment variables.
+
+For instance running as a jar on a Linux/macOS it will look like this:
+
+```Shell
+export TZ=Europe/Amsterdam # or your timezone
+export EXCLUDE_CATEGORIES="CLIENT_SIDE,GENERAL,CHALLENGE"
+export EXCLUDE_LESSONS="SqlInjectionAdvanced,SqlInjectionMitigations"
+java -jar target/webgoat-2023.8-SNAPSHOT.jar
+```
+
+Or in a docker run it would (once this version is pushed into docker hub) look like this:
+
+```Shell
+docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e EXCLUDE_CATEGORIES="CLIENT_SIDE,GENERAL,CHALLENGE" -e EXCLUDE_LESSONS="SqlInjectionAdvanced,SqlInjectionMitigations" webgoat/webgoat
+```
+
